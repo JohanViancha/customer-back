@@ -20,5 +20,5 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          nvm clean install
+          mvm clean install
           echo "Building the project..."
