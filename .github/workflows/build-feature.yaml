@@ -1,0 +1,24 @@
+
+
+name: Build and test feature branch
+on:
+  push:
+    branches:
+      - feature/*
+jobs: 
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        run: |
+          mvn clean install
+          echo "Building the project..."
