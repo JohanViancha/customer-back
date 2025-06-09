@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Debug Payload
         run: |
-          echo "Payload: ${{ github.event.client_payload.base_branch ) }}"
+          echo "Payload: ${{ github.event.client_payload.base_branch }}"
 
       - uses: actions/checkout@v3
         with:
