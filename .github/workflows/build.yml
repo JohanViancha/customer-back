@@ -36,8 +36,33 @@ jobs:
         run: |
           mvn clean test package
           echo "build with maven"
-
-
-
+  
+  merge-feature:
+    runs-on: ubuntu-latest
+    needs: build-feature
+    if: ${{ success() }}
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      #############################################################
+      # 3- merge feature branch to develop branch
+      ########################################################
+      - uses: actions/checkout@v3
+        with:
+          ref: $ {{ github.base_ref }}
+          fetch-depth: 0 
     
-      
+      - name: merge feature branch to develop branch
+        if: ${{ success() }}
+        run: |
+          git config --local user.name "github-actions"
+          git config --local user.email "viachajohan@gmail.com"
+          git merge --no-ff --verbose origin/${{ github.event.pull_request.head.ref }} -m "Merge feature branch #${{ github.event.pull_request.number }} into develop"
+
+      - name: push changes to develop branch
+        if: ${{ success() }}
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.base_ref }}
