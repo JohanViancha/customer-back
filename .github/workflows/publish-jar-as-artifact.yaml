@@ -66,3 +66,22 @@ jobs:
         with:
          name: artifactjar
          path: ${{ github.workspace }}/target/${{ env.ARTIFACT_NAME }}   
+
+    
+      - name: Verify Sha1sum
+        if: success()
+        id: cal_checksum_jar
+        run: |
+          ls -la ${{ github.workspace }}/target/
+          SHA1=$(sha1sum ${{ github.workspace }}/target/${{ env.ARTIFACT_NAME }} | awk '{ print $1 }')
+          JSON=\''{"message": "publish-artifact-event", "artifact_name": "${{ env.ARTIFACT_NAME }}", "checksum": "'$SHA1'"}'\'
+          echo "JSON_PAYLOAD=$(printf '%s\n' "$JSON")" >> $GITHUB_ENV
+
+      - name: trigger deploy artifact
+        if: success()
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: deploy-artifact-event     
+          client-payload: ${{fromJson(env.JSON_PAYLOAD)}}
